@@ -13,6 +13,7 @@
     "author": "Kai Hendry",
     "license": "MIT",
     "dependencies": {
+        "@root/async-router": "^1.0.10",
         "body-parser": "^1.19.1",
         "eta": "^1.12.3",
         "express": "^4.17.2",

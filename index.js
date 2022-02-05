@@ -1,6 +1,7 @@
 'use strict';
 
 const PORT = process.env.PORT || 3000;
+const art = require('./fixtures/pdt_art_with_nric_unwrapped.json');
 
 var Crypto = require('crypto');
 var Fs = require('fs').promises;
@@ -11,8 +12,7 @@ var Eta = require('eta');
 var express = require('express');
 var morgan = require('morgan');
 
-var app = require('@root/async-router').Router();
-var server = express().use('/', app);
+var app = express().use('/', require('@root/async-router').Router());
 var urlencodedParser = BodyParser.urlencoded({ extended: false });
 
 app.use(morgan('dev'));
@@ -37,16 +37,12 @@ app.post('/fill', async function (req, res) {
     var err;
     var rawdata;
     var updatedArt;
-    
+
     if (!req.body?.nric) {
         err = new Error('Please submit your NRIC');
         err.status = 400;
         throw err;
     }
-
-    //let rawdata = await Fs.readFile('./fixtures/pdt_art_with_nric_unwrapped.json', 'utf8');
-    //let art = JSON.parse(rawdata);
-    rawdata = require('./fixtures/pdt_art_with_nric_unwrapped.json');
 
     updatedArt = updateNRIC(art, req.body.nric);
 
@@ -65,7 +61,7 @@ app.use('/', function (err, req, res, next) {
         });
         return;
     }
-    
+
     res.json({
         message: err.message,
         status: err.status,
@@ -80,10 +76,6 @@ httpServer.listen(PORT, function () {
 });
 
 function updateNRIC(art, newNRIC) {
-    if (!newNRIC.match(/^[A-Z].{7}[A-Z]$/)) {
-        throw new Error('Invalid or missing NRIC/FIN');
-    }
-
     // https://stackoverflow.com/a/70920413/4534
     var entry = art.fhirBundle.entry
         .flatMap(function (entry) {
@@ -95,8 +87,8 @@ function updateNRIC(art, newNRIC) {
         .identifier.find(function (entry) {
             return entry.id === 'NRIC-FIN';
         });
-    
+
     entry.value = newNRIC;
 
     return art;
-};
+}
