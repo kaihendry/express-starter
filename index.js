@@ -1,55 +1,102 @@
+'use strict';
+
+const PORT = process.env.PORT || 3000;
+
+var Crypto = require('crypto');
+var Fs = require('fs').promises;
+var Http = require('http');
+
+var BodyParser = require('body-parser');
+var Eta = require('eta');
 var express = require('express');
-var eta = require('eta');
-var bodyParser = require('body-parser');
 var morgan = require('morgan');
 
-var app = express();
+var app = require('@root/async-router').Router();
+var server = express().use('/', app);
+var urlencodedParser = BodyParser.urlencoded({ extended: false });
 
 app.use(morgan('dev'));
 
-app.engine('eta', eta.renderFile);
+app.engine('eta', Eta.renderFile);
 app.set('view engine', 'eta');
-app.set('json spaces', 2);
 
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+if ('production' !== process.env.NODE_ENV) {
+    app.set('json spaces', 2);
+}
 
-app.get('/', function (req, res) {
+app.get('/', async function (req, res) {
     res.render('template', {
         nric: 'S7777777P',
         time: new Date().toISOString(),
     });
 });
 
-app.post('/fill', urlencodedParser, function (req, res, next) {
+app.use('/fill', urlencodedParser);
+
+app.post('/fill', async function (req, res) {
+    var err;
+    var rawdata;
+    var updatedArt;
+    
     if (!req.body?.nric) {
-        res.status(400).send('Please submit your NRIC');
-        return;
+        err = new Error('Please submit your NRIC');
+        err.status = 400;
+        throw err;
     }
 
-    const fs = require('fs');
+    //let rawdata = await Fs.readFile('./fixtures/pdt_art_with_nric_unwrapped.json', 'utf8');
+    //let art = JSON.parse(rawdata);
+    rawdata = require('./fixtures/pdt_art_with_nric_unwrapped.json');
 
-    let rawdata = fs.readFileSync('fixtures/pdt_art_with_nric_unwrapped.json');
-    let art = JSON.parse(rawdata);
-
-    const updatedArt = updateNRIC(art, req.body.nric);
+    updatedArt = updateNRIC(art, req.body.nric);
 
     res.json(updatedArt);
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, function () {
-    console.log(`listening to requests on port ${port}`);
+app.use('/', function (err, req, res, next) {
+    res.statusCode = err.status || 500;
+    if (err.status >= 500) {
+        var id = Crypto.randomUUID().slice(-12);
+        console.error(`ID: ${id}`);
+        console.error(err.stack);
+        res.json({
+            id: id,
+            message: `Internal Server Error ID#${id}`,
+        });
+        return;
+    }
+    
+    res.json({
+        message: err.message,
+        status: err.status,
+        code: err.code,
+    });
 });
 
-updateNRIC = function (art, newNRIC) {
+var httpServer = Http.createServer(app);
+httpServer.listen(PORT, function () {
+    var address = httpServer.address();
+    console.log(`listening to requests on`, address);
+});
+
+function updateNRIC(art, newNRIC) {
     if (!newNRIC.match(/^[A-Z].{7}[A-Z]$/)) {
         throw new Error('Invalid or missing NRIC/FIN');
     }
 
-    art.fhirBundle.entry // https://stackoverflow.com/a/70920413/4534
-        .flatMap((entry) => entry.resource)
-        .find((entry) => entry.resourceType === 'Patient')
-        .identifier.find((entry) => entry.id === 'NRIC-FIN').value = newNRIC;
+    // https://stackoverflow.com/a/70920413/4534
+    var entry = art.fhirBundle.entry
+        .flatMap(function (entry) {
+            return entry.resource;
+        })
+        .find(function (entry) {
+            return 'Patient' === entry.resourceType;
+        })
+        .identifier.find(function (entry) {
+            return entry.id === 'NRIC-FIN';
+        });
+    
+    entry.value = newNRIC;
 
     return art;
 };
