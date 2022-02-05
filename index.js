@@ -1,11 +1,15 @@
 var express = require('express');
-var app = express();
 var eta = require('eta');
 var bodyParser = require('body-parser');
+var morgan = require('morgan');
+
+var app = express();
+
+app.use(morgan('dev'));
 
 app.engine('eta', eta.renderFile);
 app.set('view engine', 'eta');
-app.set('views', './views');
+app.set('json spaces', 2);
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -16,9 +20,9 @@ app.get('/', function (req, res) {
     });
 });
 
-app.post('/fill', urlencodedParser, function (req, res) {
+app.post('/fill', urlencodedParser, function (req, res, next) {
     if (!req.body?.nric) {
-        res.send('Please submit your NRIC');
+        res.status(400).send('Please submit your NRIC');
         return;
     }
 
@@ -29,22 +33,20 @@ app.post('/fill', urlencodedParser, function (req, res) {
 
     const updatedArt = updateNRIC(art, req.body.nric);
 
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(updatedArt, null, 2));
+    res.json(updatedArt);
 });
 
-app.listen(8000, function () {
-    console.log('listening to requests on port 8000');
+const port = process.env.PORT || 3000;
+app.listen(port, function () {
+    console.log(`listening to requests on port ${port}`);
 });
 
 updateNRIC = function (art, newNRIC) {
     if (!newNRIC.match(/^[A-Z].{7}[A-Z]$/)) {
-        // TODO: Figure out to return this as a bad request
-        throw 'Invalid or missing NRIC/FIN';
+        throw new Error('Invalid or missing NRIC/FIN');
     }
 
-    // https://stackoverflow.com/a/70920413/4534
-    art.fhirBundle.entry
+    art.fhirBundle.entry // https://stackoverflow.com/a/70920413/4534
         .flatMap((entry) => entry.resource)
         .find((entry) => entry.resourceType === 'Patient')
         .identifier.find((entry) => entry.id === 'NRIC-FIN').value = newNRIC;
