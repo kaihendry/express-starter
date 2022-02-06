@@ -14,7 +14,7 @@ const app = Express();
 
 const urlencodedParser = BodyParser.urlencoded({ extended: false });
 
-app.use(Morgan('dev'));
+app.use(Morgan('tiny'));
 
 app.engine('eta', Eta.renderFile);
 app.set('view engine', 'eta');
@@ -26,7 +26,6 @@ if ('production' !== process.env.NODE_ENV) {
 app.get('/', function (req, res) {
     res.render('template', {
         nric: 'S7777777P',
-        time: new Date().toISOString(),
     });
 });
 

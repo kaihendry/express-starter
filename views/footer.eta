@@ -1,1 +1,1 @@
-<footer>Time: <%= it.time %> </footer>
+<footer><a href="https://github.com/kaihendry/express-starter">hendry's express-starter</a></footer>

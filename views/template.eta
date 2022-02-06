@@ -21,6 +21,7 @@
 <form action="/fill" method="POST">
 <input pattern="^[A-Z][0-9]{7}[A-Z]$" name="nric" value="<%= it.nric %>" required />
 <input type="submit"  />
+</form>
 
 <%~ includeFile('./footer', it) %>
 

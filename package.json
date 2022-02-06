@@ -1,15 +1,18 @@
 {
     "name": "express-starter",
     "homepage": "https://github.com/kaihendry/express-starter",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Sane defaults for creating a Web app in NodeJS",
     "main": "index.js",
     "scripts": {
-        "dev": "NODE_ENV=dev npx nodemon index.js",
+        "start": "serverless offline -s dev",
         "hint": "npx jshint .",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": [],
+    "keywords": [
+        "serverless",
+        "web"
+    ],
     "author": "Kai Hendry",
     "license": "MIT",
     "dependencies": {
@@ -20,5 +23,8 @@
         "joi": "^17.6.0",
         "morgan": "^1.10.0",
         "serverless-http": "^2.7.0"
+    },
+    "devDependencies": {
+        "serverless-offline": "^8.4.0"
     }
 }
