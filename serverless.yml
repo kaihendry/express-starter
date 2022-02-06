@@ -1,0 +1,13 @@
+service: express-starter
+frameworkVersion: '3'
+
+provider:
+    region: ap-southeast-1
+    name: aws
+    runtime: nodejs14.x
+
+functions:
+    api:
+        handler: handler.handler
+        events:
+            - httpApi: '*'

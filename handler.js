@@ -1,14 +1,14 @@
 'use strict';
 
-const PORT = process.env.PORT || 3000;
-
-const Http = require('http');
+// const PORT = process.env.PORT || 3000;
+// const Http = require('http');
 
 const BodyParser = require('body-parser');
+const CreateHttpError = require('http-errors');
 const Eta = require('eta');
 const Express = require('express');
-const CreateHttpError = require('http-errors');
 const Morgan = require('morgan');
+const Serverless = require('serverless-http');
 
 const app = Express();
 
@@ -48,8 +48,10 @@ app.use((err, req, res, next) => {
     });
 });
 
-var httpServer = Http.createServer(app);
-httpServer.listen(PORT, function () {
-    var address = httpServer.address();
-    console.log(`listening to requests on`, address);
-});
+// var httpServer = Http.createServer(app);
+// httpServer.listen(PORT, function () {
+//     var address = httpServer.address();
+//     console.log(`listening to requests on`, address);
+// });
+
+module.exports.handler = Serverless(app);
