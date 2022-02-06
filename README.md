@@ -15,8 +15,6 @@ client has a NodeJS codebase. 🤷
 
 ## TODO
 
-Figure out how to debug in VS code. Need some launch script?
-
 Figure out if I need should redo logging (I want them structured)
 
 Can I develop locally without serverless offline?
