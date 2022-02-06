@@ -4,6 +4,7 @@
 // const Http = require('http');
 
 const BodyParser = require('body-parser');
+const BasicAuth = require('express-basic-auth');
 const CreateHttpError = require('http-errors');
 const Eta = require('eta');
 const Express = require('express');
@@ -15,6 +16,13 @@ const app = Express();
 const urlencodedParser = BodyParser.urlencoded({ extended: false });
 
 app.use(Morgan('tiny'));
+
+app.use(
+    BasicAuth({
+        challenge: true,
+        users: { admin: 'supersecret' },
+    }),
+);
 
 app.engine('eta', Eta.renderFile);
 app.set('view engine', 'eta');
