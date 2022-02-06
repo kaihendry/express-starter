@@ -1,6 +1,7 @@
-# My first express
+# Acknowledgements
 
-In a similar vein to https://github.com/kaihendry/lambda-test
+-   [AJ O'Neal's review](https://www.youtube.com/watch?v=-XUdEM7vVqc) and [starter](https://github.com/BeyondCodeBootcamp/node-express-starter)
+-   https://github.com/tayfunakgc/express-joi-validation
 
 ## Goals
 
@@ -13,7 +14,5 @@ client has a NodeJS codebase. 🤷
 ## TODO
 
 Figure out how to debug in VS code. Need some launch script?
-
-Figure out error handling
 
 Figure out contract testing, e.g. a post to /fill has the desired input in the output
