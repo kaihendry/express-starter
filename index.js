@@ -12,16 +12,17 @@ var Eta = require('eta');
 var express = require('express');
 var morgan = require('morgan');
 
-var app = express().use('/', require('@root/async-router').Router());
+var app = require('@root/async-router').Router();
+var server = express().use('/', app);
 var urlencodedParser = BodyParser.urlencoded({ extended: false });
 
-app.use(morgan('dev'));
+server.use(morgan('dev'));
 
-app.engine('eta', Eta.renderFile);
-app.set('view engine', 'eta');
+server.engine('eta', Eta.renderFile);
+server.set('view engine', 'eta');
 
 if ('production' !== process.env.NODE_ENV) {
-    app.set('json spaces', 2);
+    server.set('json spaces', 2);
 }
 
 app.get('/', async function (req, res) {
