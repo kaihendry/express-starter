@@ -7,7 +7,10 @@ const router = express.Router();
 const Validator = require('../middlewares/Validator');
 
 router.post('/fill', Validator('fill'), (req, res, next) => {
-    res.json(updateNRIC(art, req.body.nric));
+    Promise.resolve(async function () {
+        throw new Error('This aaaa is a test error');
+        res.json(updateNRIC(art, req.body.nric));
+    }).catch(next);
 });
 
 function updateNRIC(art, newNRIC) {
