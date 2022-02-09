@@ -1,71 +1,32 @@
 'use strict';
 
 const PORT = process.env.PORT || 3000;
-const art = require('./fixtures/pdt_art_with_nric_unwrapped.json');
 
-var Crypto = require('crypto');
-var Fs = require('fs').promises;
 var Http = require('http');
 
-var BodyParser = require('body-parser');
-var Eta = require('eta');
+var axios = require('axios');
 var express = require('express');
 var morgan = require('morgan');
 
 var app = express().use('/', require('@root/async-router').Router());
-var urlencodedParser = BodyParser.urlencoded({ extended: false });
 
 app.use(morgan('dev'));
 
-app.engine('eta', Eta.renderFile);
-app.set('view engine', 'eta');
-
-if ('production' !== process.env.NODE_ENV) {
-    app.set('json spaces', 2);
-}
-
 app.get('/', async function (req, res) {
-    res.render('template', {
-        nric: 'S7777777P',
-        time: new Date().toISOString(),
-    });
+    // how come the error is not being handled??
+    throw new Error('This is a test error');
+
+    let octocat = await axios.get('https://api.github.com/users/octocat');
+    res.json(octocat.data);
 });
 
-app.use('/fill', urlencodedParser);
-
-app.post('/fill', async function (req, res) {
-    var err;
-    var rawdata;
-    var updatedArt;
-
-    if (!req.body?.nric) {
-        err = new Error('Please submit your NRIC');
-        err.status = 400;
-        throw err;
-    }
-
-    updatedArt = updateNRIC(art, req.body.nric);
-
-    res.json(updatedArt);
-});
-
-app.use('/', function (err, req, res, next) {
-    res.statusCode = err.status || 500;
-    if (err.status >= 500) {
-        var id = Crypto.randomUUID().slice(-12);
-        console.error(`ID: ${id}`);
-        console.error(err.stack);
-        res.json({
-            id: id,
-            message: `Internal Server Error ID#${id}`,
-        });
-        return;
-    }
-
+app.use((err, req, res, next) => {
+    res.status(err.status || 500);
     res.json({
-        message: err.message,
-        status: err.status,
-        code: err.code,
+        error: {
+            status: err.status || 500,
+            message: err.message,
+        },
     });
 });
 
@@ -74,21 +35,3 @@ httpServer.listen(PORT, function () {
     var address = httpServer.address();
     console.log(`listening to requests on`, address);
 });
-
-function updateNRIC(art, newNRIC) {
-    // https://stackoverflow.com/a/70920413/4534
-    var entry = art.fhirBundle.entry
-        .flatMap(function (entry) {
-            return entry.resource;
-        })
-        .find(function (entry) {
-            return 'Patient' === entry.resourceType;
-        })
-        .identifier.find(function (entry) {
-            return entry.id === 'NRIC-FIN';
-        });
-
-    entry.value = newNRIC;
-
-    return art;
-}
