@@ -19,3 +19,6 @@ plugins:
 custom:
     customDomain:
         domainName: sls.dabase.com
+        certificateName: '*.dabase.com'
+        endpointType: regional
+        apiType: http
