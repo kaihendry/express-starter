@@ -26,6 +26,7 @@
         "serverless-http": "^2.7.0"
     },
     "devDependencies": {
+        "serverless-domain-manager": "^6.0.1",
         "serverless-offline": "^8.4.0"
     }
 }

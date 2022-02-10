@@ -13,4 +13,9 @@ functions:
             - httpApi: '*'
 
 plugins:
-  - serverless-offline
+    - serverless-offline
+    - serverless-domain-manager
+
+custom:
+    customDomain:
+        domainName: sls.dabase.com
