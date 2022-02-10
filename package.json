@@ -16,6 +16,7 @@
     "author": "Kai Hendry",
     "license": "MIT",
     "dependencies": {
+        "axios": "^0.25.0",
         "body-parser": "^1.19.1",
         "eta": "^1.12.3",
         "express": "^4.17.2",

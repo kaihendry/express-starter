@@ -1,8 +1,8 @@
 const Joi = require('joi');
 
 const fillSchema = Joi.object({
-    nric: Joi.string()
-        .regex(/^[A-Z][0-9]{7}[A-Z]$/)
+    code: Joi.string()
+        .regex(/^[0-9]{3}$/)
         .required(),
 });
 

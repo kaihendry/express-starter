@@ -19,7 +19,7 @@
 <body>
 
 <form action="/fill" method="POST">
-<input pattern="^[A-Z][0-9]{7}[A-Z]$" name="nric" value="<%= it.nric %>" required />
+<input pattern="^[0-9]{3}$" name="code" value="<%= it.code %>" required />
 <input type="submit"  />
 </form>
 

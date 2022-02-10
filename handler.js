@@ -25,7 +25,7 @@ if ('production' !== process.env.NODE_ENV) {
 
 app.get('/', function (req, res) {
     res.render('template', {
-        nric: 'S7777777P',
+        code: '200',
     });
 });
 
@@ -39,12 +39,22 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
     res.status(err.status || 500);
-    res.json({
-        error: {
-            status: err.status || 500,
-            message: err.message,
-        },
-    });
+    if (err.response) {
+        res.json({
+            error: {
+                status: err.status || 500,
+                message: err.message,
+                response: err.response.data,
+            },
+        });
+    } else {
+        res.json({
+            error: {
+                status: err.status || 500,
+                message: err.message,
+            },
+        });
+    }
 });
 
 // var httpServer = Http.createServer(app);
