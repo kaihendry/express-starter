@@ -16,16 +16,16 @@
     "author": "Kai Hendry",
     "license": "MIT",
     "dependencies": {
-        "axios": "^0.25.0",
-        "body-parser": "^1.19.1",
+        "axios": "^0.26.0",
+        "body-parser": "^1.19.2",
         "eta": "^1.12.3",
-        "express": "^4.17.2",
+        "express": "^4.17.3",
         "http-errors": "^2.0.0",
         "joi": "^17.6.0",
         "morgan": "^1.10.0",
         "serverless-http": "^2.7.0"
     },
     "devDependencies": {
-        "serverless-offline": "^8.4.0"
+        "serverless-offline": "^8.5.0"
     }
 }
